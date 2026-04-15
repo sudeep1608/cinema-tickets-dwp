@@ -14,6 +14,10 @@ public class TicketServiceImpl implements TicketService {
      * Should only have private methods other than the one below.
      */
 
+    private static final int ADULT_PRICE = 25;
+    private static final int CHILD_PRICE = 15;
+    // INFANT = 0 (implicitly handled)
+
     private final TicketPaymentService ticketPaymentService;
     private final SeatReservationService seatReservationService;
 
@@ -36,7 +40,18 @@ public class TicketServiceImpl implements TicketService {
                                         java.util.stream.Collectors.summingInt(TicketTypeRequest::getNoOfTickets)
                                 ));
 
-        //validation of the request needs to be added before processing
+        //counts total number of tickets requested
+        int adultCount = ticketCounts.getOrDefault(TicketTypeRequest.Type.ADULT, 0);
+        int childCount = ticketCounts.getOrDefault(TicketTypeRequest.Type.CHILD,0);
+
+        //total amount is calculated based on the number of adult and child tickets requested
+        int totalAmount = (adultCount * ADULT_PRICE) + (childCount * CHILD_PRICE);
+
+        //total seats
+        int totalSeats = adultCount + childCount;
+
+        //further validation needs to be added
+
     }
 
 }
