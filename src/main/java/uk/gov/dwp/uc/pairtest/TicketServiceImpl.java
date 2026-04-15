@@ -4,6 +4,8 @@ import thirdparty.paymentgateway.TicketPaymentService;
 import thirdparty.seatbooking.SeatReservationService;
 import uk.gov.dwp.uc.pairtest.domain.TicketTypeRequest;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
+import uk.gov.dwp.uc.pairtest.model.TicketSummary;
+import uk.gov.dwp.uc.pairtest.validator.TicketRequestValidator;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -30,9 +32,8 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void purchaseTickets(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
 
-        //initial validation of accountId and ticket requests
-        validateAccountId(accountId);
-        validateTicketRequests(ticketTypeRequests);
+        //validate the raw inputs before processing the data
+        TicketRequestValidator.validate(accountId, ticketTypeRequests, null);
 
         // Group ticket requests by type and sum their quantities.
         Map<TicketTypeRequest.Type,Integer> ticketCounts =
@@ -44,31 +45,27 @@ public class TicketServiceImpl implements TicketService {
                                         java.util.stream.Collectors.summingInt(TicketTypeRequest::getNoOfTickets)
                                 ));
 
-        //counts total number of tickets requested
-        int adultCount = ticketCounts.getOrDefault(TicketTypeRequest.Type.ADULT, 0);
-        int childCount = ticketCounts.getOrDefault(TicketTypeRequest.Type.CHILD,0);
+        TicketSummary summary = new TicketSummary(ticketCounts);
+        TicketRequestValidator.validate(accountId, ticketTypeRequests, summary);
 
-        //total amount is calculated based on the number of adult and child tickets requested
-        int totalAmount = (adultCount * ADULT_PRICE) + (childCount * CHILD_PRICE);
+        int totalAmount = calculateTotalAmount(summary);
+        int totalSeats = calculateTotalSeats(summary);
 
-        //total seats
-        int totalSeats = adultCount + childCount;
-
-        //further validation needs to be added
+        // Execute payment and seat reservation
+        ticketPaymentService.makePayment(accountId, totalAmount);
+        seatReservationService.reserveSeat(accountId, totalSeats);
 
     }
 
-    private void validateAccountId(Long accountId) {
-        if (accountId == null || accountId <= 0) {
-            throw new InvalidPurchaseException("Invalid account ID.");
-        }
+    private int calculateTotalAmount(TicketSummary summary) {
+        return (summary.getAdultCount() * ADULT_PRICE)
+                + (summary.getChildCount() * CHILD_PRICE);
+        // infants are free
     }
 
-    private void validateTicketRequests(TicketTypeRequest... ticketTypeRequests) {
-        if (ticketTypeRequests == null || ticketTypeRequests.length == 0) {
-            throw new InvalidPurchaseException("No ticket requests provided.");
-        }
+    private int calculateTotalSeats(TicketSummary summary) {
+        return summary.getAdultCount() + summary.getChildCount();
+        // infants do not get seats
     }
-
 
 }
