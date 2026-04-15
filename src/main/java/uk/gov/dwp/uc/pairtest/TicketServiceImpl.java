@@ -30,6 +30,10 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void purchaseTickets(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
 
+        //initial validation of accountId and ticket requests
+        validateAccountId(accountId);
+        validateTicketRequests(ticketTypeRequests);
+
         // Group ticket requests by type and sum their quantities.
         Map<TicketTypeRequest.Type,Integer> ticketCounts =
 
@@ -53,5 +57,18 @@ public class TicketServiceImpl implements TicketService {
         //further validation needs to be added
 
     }
+
+    private void validateAccountId(Long accountId) {
+        if (accountId == null || accountId <= 0) {
+            throw new InvalidPurchaseException("Invalid account ID.");
+        }
+    }
+
+    private void validateTicketRequests(TicketTypeRequest... ticketTypeRequests) {
+        if (ticketTypeRequests == null || ticketTypeRequests.length == 0) {
+            throw new InvalidPurchaseException("No ticket requests provided.");
+        }
+    }
+
 
 }
