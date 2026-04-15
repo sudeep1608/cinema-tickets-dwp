@@ -32,10 +32,10 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void purchaseTickets(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
 
-        //validate the raw inputs before processing the data
+        //Validate the raw inputs before processing the data
         TicketRequestValidator.validate(accountId, ticketTypeRequests, null);
 
-        // Group ticket requests by type and sum their quantities.
+        //Group ticket requests by type and sum their quantities.
         Map<TicketTypeRequest.Type,Integer> ticketCounts =
 
                 Arrays.stream(ticketTypeRequests)
@@ -51,7 +51,7 @@ public class TicketServiceImpl implements TicketService {
         int totalAmount = calculateTotalAmount(summary);
         int totalSeats = calculateTotalSeats(summary);
 
-        // Execute payment and seat reservation
+        //Execute payment and seat reservation
         ticketPaymentService.makePayment(accountId, totalAmount);
         seatReservationService.reserveSeat(accountId, totalSeats);
 
@@ -60,12 +60,12 @@ public class TicketServiceImpl implements TicketService {
     private int calculateTotalAmount(TicketSummary summary) {
         return (summary.getAdultCount() * ADULT_PRICE)
                 + (summary.getChildCount() * CHILD_PRICE);
-        // infants are free
+        //Infants are free
     }
 
     private int calculateTotalSeats(TicketSummary summary) {
         return summary.getAdultCount() + summary.getChildCount();
-        // infants do not get seats
+        //Infants do not get seats
     }
 
 }
