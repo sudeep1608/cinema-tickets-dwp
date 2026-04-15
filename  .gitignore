@@ -1,0 +1,15 @@
+# Maven target directory
+target/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+
+# Logs
+*.log
+
+# Build output
+out/
