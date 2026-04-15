@@ -23,8 +23,8 @@ public class TicketServiceImpl implements TicketService {
     private final TicketPaymentService ticketPaymentService;
     private final SeatReservationService seatReservationService;
 
-    public TicketServiceImpl(TicketPaymentService ticketPaymentService,
-                             SeatReservationService seatReservationService) {
+    public TicketServiceImpl(TicketPaymentService ticketPaymentService,SeatReservationService seatReservationService)
+    {
         this.ticketPaymentService = ticketPaymentService;
         this.seatReservationService = seatReservationService;
     }
@@ -37,7 +37,6 @@ public class TicketServiceImpl implements TicketService {
 
         //Group ticket requests by type and sum their quantities.
         Map<TicketTypeRequest.Type,Integer> ticketCounts =
-
                 Arrays.stream(ticketTypeRequests)
                         .collect(
                                 Collectors.groupingBy(
@@ -58,8 +57,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private int calculateTotalAmount(TicketSummary summary) {
-        return (summary.getAdultCount() * ADULT_PRICE)
-                + (summary.getChildCount() * CHILD_PRICE);
+        return (summary.getAdultCount() * ADULT_PRICE) + (summary.getChildCount() * CHILD_PRICE);
         //Infants are free
     }
 

@@ -51,10 +51,10 @@ public class TicketServiceImplTest {
                 ticketService.purchaseTickets(1L)
         );
     }
+
     //Should throw exception when ticket requests is null.
     @Test
     void shouldThrowExceptionWhenTicketRequestsIsNull() {
-
         assertThrows(InvalidPurchaseException.class, () ->
                 ticketService.purchaseTickets(1L, (TicketTypeRequest[]) null)
         );
@@ -72,9 +72,7 @@ public class TicketServiceImplTest {
     @Test
     void shouldPurchaseAdultTicketsSuccessfully() {
         TicketTypeRequest adult = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 2);
-
         ticketService.purchaseTickets(1L, adult);
-
         verify(paymentService).makePayment(1L, 50);
         verify(seatReservationService).reserveSeat(1L, 2);
     }
@@ -98,12 +96,12 @@ public class TicketServiceImplTest {
         verify(paymentService).makePayment(1L, 50);
         verify(seatReservationService).reserveSeat(1L, 2);
     }
+
     //Should throw exception when infants exceed adults.
     @Test
     void shouldThrowExceptionWhenInfantsExceedAdults() {
         TicketTypeRequest adult = new TicketTypeRequest(TicketTypeRequest.Type.ADULT, 1);
         TicketTypeRequest infant = new TicketTypeRequest(TicketTypeRequest.Type.INFANT, 2);
-
         assertThrows(InvalidPurchaseException.class,
                 () -> ticketService.purchaseTickets(1L, adult, infant));
     }
@@ -112,7 +110,6 @@ public class TicketServiceImplTest {
     @Test
     void shouldThrowExceptionWhenChildWithoutAdult() {
         TicketTypeRequest child = new TicketTypeRequest(TicketTypeRequest.Type.CHILD, 2);
-
         assertThrows(InvalidPurchaseException.class,
                 () -> ticketService.purchaseTickets(1L, child));
     }
